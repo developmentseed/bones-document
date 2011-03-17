@@ -1,2 +1,2 @@
-module.exports = require('./bones-document');
+module.exports = require('./bones-document.server');
 
