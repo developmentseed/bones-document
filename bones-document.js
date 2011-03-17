@@ -10,15 +10,27 @@ var Bones = Bones || {};
 Bones.models = Bones.models || {};
 Bones.views = Bones.views || {};
 
+// Document
+// --------
+// Document model. Provides several extensions to the default `Model` class.
+// - `validateSchema`: JSV-based validation of model attributes against its
+//   JSON schema. A default implementation of `validate` is provided which
+//   does a JSV validation. Override `validate` to add additional custom
+//   validation or exclude JSV validation alltogether.
+// - ``renderer`: Generate a renderer object for this model. Provides an object
+//   with key/value pairs of attributes described by the model schema and a
+//   `render` method that can be used to render
 Bones.models.Document = Backbone.Model.extend({
+    // Partial JSON schema including only the elements of the `properties`
+    // object. Should describe all attributes of model instances.
     schema: {},
-    // Use JSV validation by default.
+    // Use JSV validation by default. Override this to provide your own custom
+    // validation logic.
     validate: function(attr) {
         var error = this.validateSchema(attr);
         return error;
     },
-    // Provide a default `validateSchema()` method to validate attributes
-    // against a JSON schema.
+    // Method to validate attributes against the model's JSON schema.
     validateSchema: function(attr) {
         var env = JSV.createEnvironment();
         for (var key in attr) {
@@ -43,7 +55,14 @@ Bones.models.Document = Backbone.Model.extend({
             }
         }
     },
-    // Retrieve a model attribute renderer.
+    // Retrieve a model attribute renderer. Returns an object with key/value
+    // pairs for model attributes and optionally a `render` method that can
+    // be used to render each attribute using its corresponding method in the
+    // `renderers` hash.
+    //
+    // See the `Bones.views.AdminDocument` view for how the `renderer` method
+    // can be used in the context of a mustache template.
+    //
     // - `options.editable` Boolean. If `true` returns all schema attributes.
     //   Otherwise only includes populated values.
     // - `options.keys` Boolean. If `true` returns hash of keys.
@@ -74,6 +93,9 @@ Bones.models.Document = Backbone.Model.extend({
         }
         return options.keys ? data : new Renderer(this, data);
     },
+    // Hash of render methods. Each key corresponds to the `format` specified
+    // for an attribute in `schema`. If no matching `format` is found the
+    // `default` formatter is used.
     renderers: {
         default: function(value) {
             return value;
@@ -83,21 +105,31 @@ Bones.models.Document = Backbone.Model.extend({
             return (new Showdown.converter()).makeHtml(value);
         }
     },
+    // Editor widget method.
+    // - `op` String [form|value]. When `form`, replaces `el` with an editable
+    //   input element. When `value`, expects `el` to be the editable input
+    //   element and returns the attribute value to be used.
+    // - `el` Object. DOM element reference for this attribute.
+    // - `attribute` String. Attribute key corresponding to a `schema` key.
     edit: function(op, el, attribute) {
         var format = this.schema[attribute] && this.schema[attribute].format,
             editor = this.editors[format] || this.editors.default;
-        return editor.call(this, op, el, attribute);
+        return editor[op].call(this, el, attribute);
     },
+    // Hash of editor methods. Each key corresponds to the `format` specified
+    // for an attribute in `schema`. If no matching `format` is found the
+    // `default` editor is used.
     editors: {
-        default: function(op, el, attribute) {
-            if (op === 'form') {
+        default: {
+            form: function(el, attribute) {
                 el.attr('contentEditable', true);
-            } else {
+            },
+            value: function(el, attribute) {
                 return el.text();
             }
         },
-        select: function(op, el, attribute) {
-            if (op === 'form') {
+        select: {
+            form: function(el, attribute) {
                 var select = $('<select></select>')
                     .attr('class', el.attr('class'));
                 _.each(this.schema[attribute]['enum'], function(item) {
@@ -106,12 +138,13 @@ Bones.models.Document = Backbone.Model.extend({
                 });
                 select.val(this.get(attribute));
                 el.replaceWith(select);
-            } else {
+            },
+            value: function(el, attribute) {
                 return el.val();
             }
         },
-        markdown: function(op, el, attribute) {
-            if (op === 'form') {
+        markdown: {
+            form: function(el, attribute) {
                 var textarea = $('<textarea></textarea>')
                     .val(this.get(attribute))
                     .attr('class', el.attr('class'));
@@ -145,14 +178,24 @@ Bones.models.Document = Backbone.Model.extend({
                     .bind('keydown', updateSize)
                     .bind('change', updateSize);
                 updateSize.call(textarea);
-            } else {
+            },
+            value: function(el, attribute) {
                 return el.val();
             }
         }
     }
 });
 
+// AdminDocument
+// -------------
+// View. Provides a `bones-admin` panel for offering inline editing of document
+// models. Should be instantiated from within the main display view
+// of a model and passed `model`, `view` where `model` is the model to be
+// edited and `view` is the display view. Upon editing `display.render()` will
+// be called with options that can be passed to `Document.renderer()` or
+// overridden as needed.
 Bones.views.AdminDocument = Backbone.View.extend({
+    display: null,
     events: {
         'click .edit': 'edit',
         'click .del': 'del',
@@ -161,7 +204,7 @@ Bones.views.AdminDocument = Backbone.View.extend({
     },
     initialize: function(options) {
         _.bindAll(this, 'render', 'edit', 'del', 'save', 'cancel');
-        this.scope = options.scope;
+        this.display = options.display;
         this.render().trigger('attach');
     },
     render: function() {
@@ -170,9 +213,9 @@ Bones.views.AdminDocument = Backbone.View.extend({
     },
     edit: function() {
         var that = this;
-        this.scope.edit();
+        this.display.render({editable: true});
         _(this.model.renderer({ editable: true, keys: true })).each(function(key) {
-            var el = that.scope.$('.' + that.model.id + '-' + key);
+            var el = that.display.$('.' + that.model.id + '-' + key);
             el.size() && that.model.edit('form', el, key);
         });
         $('body').addClass('bonesAdminEditing');
@@ -188,19 +231,19 @@ Bones.views.AdminDocument = Backbone.View.extend({
         var that = this;
         var data = {};
         _(this.model.renderer({ editable: true, keys: true })).each(function(key) {
-            var el = that.scope.$('.' + that.model.id + '-' + key);
+            var el = that.display.$('.' + that.model.id + '-' + key);
             el.size() && (data[key] = that.model.edit('value', el, key));
         });
         if (!_.isEmpty(data)) {
             that.model.save(data, { error: window.admin.error });
         }
         $('body').removeClass('bonesAdminEditing');
-        this.scope.render();
+        this.display.render();
         this.render();
     },
     cancel: function() {
         $('body').removeClass('bonesAdminEditing');
-        this.scope.render();
+        this.display.render();
     }
 });
 
