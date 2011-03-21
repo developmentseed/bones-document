@@ -238,12 +238,12 @@ Bones.views.AdminDocument = Backbone.View.extend({
             that.model.save(data, { error: window.admin.error });
         }
         $('body').removeClass('bonesAdminEditing');
-        this.display.render();
+        this.display.render().trigger('attach');
         this.render();
     },
     cancel: function() {
         $('body').removeClass('bonesAdminEditing');
-        this.display.render();
+        this.display.render().trigger('attach');
     }
 });
 
