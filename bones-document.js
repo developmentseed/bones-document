@@ -72,7 +72,7 @@ Bones.models.Document = Backbone.Model.extend({
         var Renderer = function(model, attributes) {
             var that = this;
             var render = function(attribute) {
-                var renderer = model.renderers.default,
+                var renderer = model.renderers['default'],
                     value = model.get(attribute),
                     type = model.schema[attribute] && model.schema[attribute].format;
                 (type && model.renderers[type]) && (renderer = model.renderers[type]);
@@ -97,7 +97,7 @@ Bones.models.Document = Backbone.Model.extend({
     // for an attribute in `schema`. If no matching `format` is found the
     // `default` formatter is used.
     renderers: {
-        default: function(value) {
+        'default': function(value) {
             return value;
         },
         markdown: function(value) {
@@ -113,14 +113,14 @@ Bones.models.Document = Backbone.Model.extend({
     // - `attribute` String. Attribute key corresponding to a `schema` key.
     edit: function(op, el, attribute) {
         var format = this.schema[attribute] && this.schema[attribute].format,
-            editor = this.editors[format] || this.editors.default;
+            editor = this.editors[format] || this.editors['default'];
         return editor[op].call(this, el, attribute);
     },
     // Hash of editor methods. Each key corresponds to the `format` specified
     // for an attribute in `schema`. If no matching `format` is found the
     // `default` editor is used.
     editors: {
-        default: {
+        'default': {
             form: function(el, attribute) {
                 el.attr('contentEditable', true);
             },
