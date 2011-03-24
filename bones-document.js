@@ -161,7 +161,7 @@ Bones.models.Document = Backbone.Model.extend({
                             height: 0,
                             minHeight: 0,
                             width: textarea.css('width'),
-                            padding: textarea.css('padding'),
+                            padding: $.browser.msie ? 0 : textarea.css('padding'),
                             lineHeight: textarea.css('lineHeight'),
                             textDecoration: textarea.css('textDecoration'),
                             letterSpacing: textarea.css('letterSpacing')
