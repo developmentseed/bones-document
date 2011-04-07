@@ -3,7 +3,8 @@
     "version": "0.2.0",
 
     "dependencies": {
-        "JSV": "https://github.com/garycourt/JSV/tarball/e05e2595cb9e11251e5231a1f384043443532bd6"
+        "JSV": "https://github.com/garycourt/JSV/tarball/e05e2595cb9e11251e5231a1f384043443532bd6",
+        "showdown": "https://github.com/developmentseed/showdown/tarball/6872d7229440a3b3adb6089dacb325dbe8c6ade7"
     },
 
     "bundleDependencies": [

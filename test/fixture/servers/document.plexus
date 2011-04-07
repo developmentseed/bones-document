@@ -1,6 +1,6 @@
 server = Plexus.Server.extend();
 
 server.prototype.initialize = function() {
-    this.register(models['Document']);
+    this.register(models['Page']);
     this.register(routers['AdminDocument']);
 };

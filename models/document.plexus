@@ -1,9 +1,13 @@
+if (require) {
+    JSV = require('jsv').JSV;
+    Showdown = require('showdown').Showdown;
+}
 // Document model. Provides several extensions to the default `Model` class.
 // - `validateSchema`: JSV-based validation of model attributes against its
 //   JSON schema. A default implementation of `validate` is provided which
 //   does a JSV validation. Override `validate` to add additional custom
 //   validation or exclude JSV validation alltogether.
-// - ``renderer`: Generate a renderer object for this model. Provides an object
+// - `renderer`: Generate a renderer object for this model. Provides an object
 //   with key/value pairs of attributes described by the model schema and a
 //   `render` method that can be used to render
 model = Backbone.Model.extend({
@@ -119,7 +123,7 @@ model = Backbone.Model.extend({
                 var select = $('<select></select>')
                     .attr('class', el.attr('class'));
                 _.each(this.schema[attribute]['enum'], function(item) {
-                    var option = $('<option></option').val(item).text(item);
+                    var option = $('<option></option>').val(item).text(item);
                     select.append(option);
                 });
                 select.val(this.get(attribute));
