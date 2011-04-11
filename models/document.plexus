@@ -1,7 +1,3 @@
-if (require) {
-    JSV = require('jsv').JSV;
-    Showdown = require('showdown').Showdown;
-}
 // Document model. Provides several extensions to the default `Model` class.
 // - `validateSchema`: JSV-based validation of model attributes against its
 //   JSON schema. A default implementation of `validate` is provided which
@@ -11,6 +7,13 @@ if (require) {
 //   with key/value pairs of attributes described by the model schema and a
 //   `render` method that can be used to render
 model = Backbone.Model.extend({
+    initialize: function() {
+        // Lazy initialization to reduce startup time.
+        if (require && (typeof JSV === 'undefined' || typeof Showdown === 'undefined')) {
+            JSV = require('jsv').JSV;
+            Showdown = require('showdown').Showdown;
+        }
+    },
     // Partial JSON schema including only the elements of the `properties`
     // object. Should describe all attributes of model instances.
     schema: {},
