@@ -1,4 +1,4 @@
-// View. Provides a `plexus-admin` panel for offering inline editing of document
+// View. Provides a `bones-admin` panel for offering inline editing of document
 // models. Should be instantiated from within the main display view
 // of a model and passed `model`, `view` where `model` is the model to be
 // edited and `view` is the display view. Upon editing `display.render()` will
@@ -28,7 +28,7 @@ view = Backbone.View.extend({
             var el = that.display.$('.' + that.model.id + '-' + key);
             el.size() && that.model.edit('form', el, key);
         });
-        $('body').addClass('plexus-admin-editing');
+        $('body').addClass('bones-admin-editing');
     },
     del: function() {
         confirm('Are you sure you want to delete this page?') && this.model.destroy({
@@ -49,12 +49,12 @@ view = Backbone.View.extend({
         if (!_.isEmpty(data)) {
             that.model.save(data, { error: window.admin.error });
         }
-        $('body').removeClass('plexus-admin-editing');
+        $('body').removeClass('bones-admin-editing');
         this.display.render().trigger('attach');
         this.render();
     },
     cancel: function() {
-        $('body').removeClass('plexus-admin-editing');
+        $('body').removeClass('bones-admin-editing');
         this.display.render().trigger('attach');
     }
 });

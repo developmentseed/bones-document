@@ -1,6 +1,6 @@
 {
-    "name": "plexus-document",
-    "version": "0.2.0",
+    "name": "bones-document",
+    "version": "1.0.0",
 
     "dependencies": {
         "JSV": "https://github.com/garycourt/JSV/tarball/e05e2595cb9e11251e5231a1f384043443532bd6",
@@ -8,7 +8,7 @@
     },
 
     "bundleDependencies": [
-        "plexus",
+        "bones",
         "expresso"
     ],
 
