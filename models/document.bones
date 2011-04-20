@@ -25,7 +25,6 @@ model = Backbone.Model.extend({
     },
     // Method to validate attributes against the model's JSON schema.
     validateSchema: function(attr) {
-        return;
         var env = JSV.createEnvironment();
         for (var key in attr) {
             if (this.schema[key]) {
