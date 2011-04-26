@@ -66,12 +66,14 @@ model = Backbone.Model.extend({
         var that = this;
         var Renderer = function(model, attributes) {
             var render = function(attribute) {
-                var renderer = model.renderers['default'],
-                    value = model.get(attribute),
-                    type = model.schema[attribute] && model.schema[attribute].format;
-                (options.formatters && options.formatters[attribute]) && (type = options.formatters[attribute]);
-                (type && model.renderers[type]) && (renderer = model.renderers[type]);
-                return renderer(value);
+                var type = model.schema[attribute] && model.schema[attribute].format;
+                if (options.formatters && options.formatters[attribute]) {
+                    type = options.formatters[attribute];
+                }
+                if (type && model.renderers[type]) {
+                    return renderer = model.renderers[type](model.get(attribute));
+                }
+                return model.escape(attribute);
             };
             return _.extend({ render: render }, attributes);
         };
@@ -90,9 +92,9 @@ model = Backbone.Model.extend({
     },
     // Hash of render methods. Each key corresponds to the `format` specified
     // for an attribute in `schema`. If no matching `format` is found the
-    // `default` formatter is used.
+    // model.escape() is used.
     renderers: {
-        'default': function(value) {
+        raw: function(value) {
             return value;
         },
         markdown: function(value) {
