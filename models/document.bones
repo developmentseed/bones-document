@@ -69,7 +69,7 @@ model = Backbone.Model.extend({
                 var renderer = model.renderers['default'],
                     value = model.get(attribute),
                     type = model.schema[attribute] && model.schema[attribute].format;
-                (options.formats && options.formatters[attribute]) && (type = options.formatters[attribute]);
+                (options.formatters && options.formatters[attribute]) && (type = options.formatters[attribute]);
                 (type && model.renderers[type]) && (renderer = model.renderers[type]);
                 return renderer(value);
             };
