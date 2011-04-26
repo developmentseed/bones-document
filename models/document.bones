@@ -63,7 +63,6 @@ model = Backbone.Model.extend({
         options = options || {};
         var that = this;
         var Renderer = function(model, attributes) {
-            var that = this;
             var render = function(attribute) {
                 var renderer = model.renderers['default'],
                     value = model.get(attribute),
