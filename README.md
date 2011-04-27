@@ -54,3 +54,26 @@ A view for displaying a Bones Document may look like:
       <h2><%= render('title') %></h2>
       <%= render('content') %>
     </div>
+
+Of course the default formatters aren't going to be enough. It's possible to provide new ones, and select which formatter is used within a view. To define additional formatters you'll need to add them to the model's prototype. So in `/models/post.bones` you may have:
+
+    model.prototype.renderers = _.extend({
+        blinky: function(value) {
+            return '<blink>' + value '</blink>';
+        }
+    }, model.prototype.renderers);
+
+To set a custom formatter to be the default display for a field you just need so set it as the `format` of an attribute in the schema.
+
+      ...
+            'title': {
+                'type': 'string',
+                'title': 'Title',
+                'format' 'blinky'
+            },
+      ...
+
+Alternatively, you may pass a set of attribute to formatter mappings in as options when you instantiate a renderer. For, example to specify the `blinky` formatter from within a view you could do; 
+
+    $(this.el).html(this.template(model.renderer({formatters: {title: 'blinky'}})));
+
