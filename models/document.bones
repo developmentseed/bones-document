@@ -10,7 +10,7 @@ model = Backbone.Model.extend({
     initialize: function() {
         // Lazy initialization to reduce startup time.
         if (typeof require != 'undefined' && (typeof JSV === 'undefined' || typeof Showdown === 'undefined')) {
-            JSV = require('jsv').JSV;
+            JSV = require('JSV').JSV;
             Showdown = require('showdown').Showdown;
         }
     },
