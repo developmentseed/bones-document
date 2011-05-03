@@ -1,7 +1,6 @@
-var plugin = module.exports = require('bones').plugin(__dirname);
-
-plugin.load();
+#!/usr/bin/env node
+require('bones').load(__dirname);
 
 if (!module.parent) {
-    plugin.start();
+    require('bones').start();
 }
