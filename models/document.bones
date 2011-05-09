@@ -1,3 +1,11 @@
+var JSV = require('jsv').JSV;
+var env = JSV.createEnvironment('json-schema-draft-03');
+
+env.setOption('defaultSchemaURI', 'http://json-schema.org/hyper-schema#');
+env.setOption('latestJSONSchemaSchemaURI', 'http://json-schema.org/schema#');
+env.setOption('latestJSONSchemaHyperSchemaURI', 'http://json-schema.org/hyper-schema#');
+env.setOption('latestJSONSchemaLinksURI', 'http://json-schema.org/links#');
+
 // Document model. Provides several extensions to the default `Model` class.
 // - `validateSchema`: JSV-based validation of model attributes against its
 //   JSON schema. A default implementation of `validate` is provided which
@@ -9,42 +17,46 @@
 model = Backbone.Model.extend({
     initialize: function() {
         // Lazy initialization to reduce startup time.
-        if (typeof require != 'undefined' && (typeof JSV === 'undefined' || typeof Showdown === 'undefined')) {
-            JSV = require('JSV').JSV;
+        if (typeof require != 'undefined' && (typeof Showdown === 'undefined')) {
             Showdown = require('showdown').Showdown;
         }
     },
-    // Partial JSON schema including only the elements of the `properties`
-    // object. Should describe all attributes of model instances.
-    schema: {},
+    // JSON schema. Should describe all attributes of model instances.
+    schema: {
+        type: 'object',
+        properties: {}
+    },
     // Use JSV validation by default. Override this to provide your own custom
     // validation logic.
     validate: function(attr) {
         var error = this.validateSchema(attr);
         return error;
     },
+    // Get the JSV schema object for this model, registering it if not found.
+    getSchema: function() {
+        var schema;
+        if (this.schema.id) {
+            schema = (env.findSchema(this.schema.id)
+            || env.createSchema(this.schema, undefined, this.schema.id)
+        );
+        }
+        else {
+            schema = env.createSchema(this.schema);
+        }
+
+        return schema;
+    },
     // Method to validate attributes against the model's JSON schema.
     validateSchema: function(attr) {
-        var env = JSV.createEnvironment();
-        for (var key in attr) {
-            if (this.schema[key]) {
-                var property = this.schema[key],
-                    value = attr[key];
-                // Do a custom check for required properties, (e.g. do not allow
-                // an empty string to validate against a required property.)
-                if (!value && property.required) {
-                    return (property.title || key) + ' is required.';
-                }
+        var errors = this.getSchema().validate(attr).errors;
+        if (errors.length) {
+            var error = errors.pop();
+            var property = env.findSchema(error.schemaUri).getValue();
 
-                var errors = env.validate(value, property).errors;
-                if (errors.length) {
-                    var error = errors.pop();
-                    if (property.description) {
-                        return property.description;
-                    } else {
-                        return (property.title || key) + ': ' + error.message;
-                    }
-                }
+            if (property.description) {
+                return property.description;
+            } else {
+                return (property.title || error.schemaUri.replace(/.*\//, '')) + ': ' + error.message;
             }
         }
     },
@@ -66,7 +78,7 @@ model = Backbone.Model.extend({
         var that = this;
         var Renderer = function(model, attributes) {
             var render = function(attribute) {
-                var type = model.schema[attribute] && model.schema[attribute].format;
+                var type = model.schema.properties && model.schema.properties[attribute] && model.schema.properties[attribute].format;
                 if (options.formatters && options.formatters[attribute]) {
                     type = options.formatters[attribute];
                 }
@@ -79,7 +91,7 @@ model = Backbone.Model.extend({
         };
         var data = {};
         if (options.editable) {
-            _(this.schema).chain()
+            _(this.schema.properties || {}).chain()
                 .keys()
                 .each(function(key) { data[key] = key; });
         } else {
@@ -109,7 +121,7 @@ model = Backbone.Model.extend({
     // - `el` Object. DOM element reference for this attribute.
     // - `attribute` String. Attribute key corresponding to a `schema` key.
     edit: function(op, el, attribute) {
-        var format = this.schema[attribute] && this.schema[attribute].format,
+        var format = this.schema.properties && this.schema.properties[attribute] && this.schema.properties[attribute].format,
             editor = this.editors[format] || this.editors['default'];
         return editor[op].call(this, el, attribute);
     },
@@ -129,7 +141,7 @@ model = Backbone.Model.extend({
             form: function(el, attribute) {
                 var select = $('<select></select>')
                     .attr('class', el.attr('class'));
-                _.each(this.schema[attribute]['enum'], function(item) {
+                _.each(this.schema.properties[attribute]['enum'], function(item) {
                     var option = $('<option></option>').val(item).text(item);
                     select.append(option);
                 });
