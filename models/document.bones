@@ -1,10 +1,4 @@
-var JSV = require('jsv').JSV;
-var env = JSV.createEnvironment('json-schema-draft-03');
-
-env.setOption('defaultSchemaURI', 'http://json-schema.org/hyper-schema#');
-env.setOption('latestJSONSchemaSchemaURI', 'http://json-schema.org/schema#');
-env.setOption('latestJSONSchemaHyperSchemaURI', 'http://json-schema.org/hyper-schema#');
-env.setOption('latestJSONSchemaLinksURI', 'http://json-schema.org/links#');
+var env;
 
 // Document model. Provides several extensions to the default `Model` class.
 // - `validateSchema`: JSV-based validation of model attributes against its
@@ -17,8 +11,18 @@ env.setOption('latestJSONSchemaLinksURI', 'http://json-schema.org/links#');
 model = Backbone.Model.extend({
     initialize: function() {
         // Lazy initialization to reduce startup time.
-        if (typeof require != 'undefined' && (typeof Showdown === 'undefined')) {
-            Showdown = require('showdown').Showdown;
+        if (typeof require != 'undefined') {
+            JSV = require('jsv').JSV;
+            if (typeof Showdown === 'undefined') {
+                Showdown = require('showdown').Showdown;
+            }
+        }
+        if (!env) {
+            env = JSV.createEnvironment('json-schema-draft-03');
+            env.setOption('defaultSchemaURI', 'http://json-schema.org/hyper-schema#');
+            env.setOption('latestJSONSchemaSchemaURI', 'http://json-schema.org/schema#');
+            env.setOption('latestJSONSchemaHyperSchemaURI', 'http://json-schema.org/hyper-schema#');
+            env.setOption('latestJSONSchemaLinksURI', 'http://json-schema.org/links#');
         }
     },
     // JSON schema. Should describe all attributes of model instances.
