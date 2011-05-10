@@ -69,8 +69,8 @@ model = Backbone.Model.extend({
     // be used to render each attribute using its corresponding method in the
     // `renderers` hash.
     //
-    // See the `AdminDocument` view for how the `renderer` method
-    // can be used in the context of a mustache template.
+    // See the `admin_document._` view for how the `renderer` method
+    // can be used in the context of an underscore template.
     //
     // - `options.editable` Boolean. If `true` returns all schema attributes.
     //   Otherwise only includes populated values.
