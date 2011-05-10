@@ -47,7 +47,7 @@ view = Backbone.View.extend({
             el.size() && (data[key] = that.model.edit('value', el, key));
         });
         if (!_.isEmpty(data)) {
-            that.model.save(data, { error: window.admin.error });
+            that.model.save(data, { error: Bones.admin.error });
         }
         $('html').removeClass('bonesAdminEditing');
         this.display.render().trigger('attach');
