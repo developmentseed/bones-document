@@ -35,7 +35,7 @@ view = Backbone.View.extend({
             success: function() {
                 window.location.hash = '#/';
             },
-            error: window.admin.error
+            error: Bones.admin.error
         });
         return false;
     },
