@@ -18,7 +18,7 @@ view = Backbone.View.extend({
         this.render().trigger('attach');
     },
     render: function() {
-        $(this.el).html(this.template('AdminDocument', this.model.renderer()));
+        $(this.el).html(templates.AdminDocument(this.model.renderer()));
         return this;
     },
     edit: function() {
