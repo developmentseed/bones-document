@@ -1,5 +1,5 @@
-strong.label= render(id)
-input(type='button', value='Edit').viewing.edit
-input(type='button', value='Delete').viewing.del
-input(type='button', value='Save').editing.save
-input(type='button', value='Cancel').editing.cancel
+<strong><label><%= id %></label></strong>
+<input type='button' value='Edit' class='viewing edit'>
+<input type='button' value='Delete' class='viewing del'>
+<input type='button' value='Save' class='editing save'>
+<input type='button' value='Cancel' class='editing cancel'>
