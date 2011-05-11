@@ -1,4 +1,19 @@
+if (Bones.server) {
+    JSV = require('JSV').JSV;
+    Showdown = require('showdown').Showdown;
+}
+
 var env;
+function getEnv() {
+    if (!env) {
+        env = JSV.createEnvironment('json-schema-draft-03');
+        env.setOption('defaultSchemaURI', 'http://json-schema.org/hyper-schema#');
+        env.setOption('latestJSONSchemaSchemaURI', 'http://json-schema.org/schema#');
+        env.setOption('latestJSONSchemaHyperSchemaURI', 'http://json-schema.org/hyper-schema#');
+        env.setOption('latestJSONSchemaLinksURI', 'http://json-schema.org/links#');
+    }
+    return env;
+}
 
 // Document model. Provides several extensions to the default `Model` class.
 // - `validateSchema`: JSV-based validation of model attributes against its
@@ -9,22 +24,6 @@ var env;
 //   with key/value pairs of attributes described by the model schema and a
 //   `render` method that can be used to render
 model = Backbone.Model.extend({
-    initialize: function() {
-        // Lazy initialization to reduce startup time.
-        if (typeof require != 'undefined') {
-            JSV = require('JSV').JSV;
-            if (typeof Showdown === 'undefined') {
-                Showdown = require('showdown').Showdown;
-            }
-        }
-        if (!env) {
-            env = JSV.createEnvironment('json-schema-draft-03');
-            env.setOption('defaultSchemaURI', 'http://json-schema.org/hyper-schema#');
-            env.setOption('latestJSONSchemaSchemaURI', 'http://json-schema.org/schema#');
-            env.setOption('latestJSONSchemaHyperSchemaURI', 'http://json-schema.org/hyper-schema#');
-            env.setOption('latestJSONSchemaLinksURI', 'http://json-schema.org/links#');
-        }
-    },
     // JSON schema. Should describe all attributes of model instances.
     schema: {
         type: 'object',
@@ -40,12 +39,12 @@ model = Backbone.Model.extend({
     getSchema: function() {
         var schema;
         if (this.schema.id) {
-            schema = (env.findSchema(this.schema.id)
-            || env.createSchema(this.schema, undefined, this.schema.id)
+            schema = (getEnv().findSchema(this.schema.id)
+            || getEnv().createSchema(this.schema, undefined, this.schema.id)
         );
         }
         else {
-            schema = env.createSchema(this.schema);
+            schema = getEnv().createSchema(this.schema);
         }
 
         return schema;
@@ -55,7 +54,7 @@ model = Backbone.Model.extend({
         var errors = this.getSchema().validate(attr).errors;
         if (errors.length) {
             var error = errors.pop();
-            var property = env.findSchema(error.schemaUri).getValue();
+            var property = getEnv().findSchema(error.schemaUri).getValue();
 
             if (property.description) {
                 return property.description;
