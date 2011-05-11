@@ -28,14 +28,14 @@ view = Backbone.View.extend({
             var el = that.display.$('.' + that.model.id + '-' + key);
             el.size() && that.model.edit('form', el, key);
         });
-        $('body').addClass('bones-admin-editing');
+        $('html').addClass('bonesAdminEditing');
     },
     del: function() {
         confirm('Are you sure you want to delete this page?') && this.model.destroy({
             success: function() {
                 window.location.hash = '#/';
             },
-            error: window.admin.error
+            error: Bones.admin.error
         });
         return false;
     },
@@ -47,14 +47,14 @@ view = Backbone.View.extend({
             el.size() && (data[key] = that.model.edit('value', el, key));
         });
         if (!_.isEmpty(data)) {
-            that.model.save(data, { error: window.admin.error });
+            that.model.save(data, { error: Bones.admin.error });
         }
-        $('body').removeClass('bones-admin-editing');
+        $('html').removeClass('bonesAdminEditing');
         this.display.render().trigger('attach');
         this.render();
     },
     cancel: function() {
-        $('body').removeClass('bones-admin-editing');
+        $('html').removeClass('bonesAdminEditing');
         this.display.render().trigger('attach');
     }
 });
