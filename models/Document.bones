@@ -16,7 +16,7 @@ function getEnv() {
 }
 
 // Document model. Provides several extensions to the default `Model` class.
-// - `validateSchema`: JSV-based validation of model attributes against its
+// - `validateAttributes`: JSV-based validation of model attributes against its
 //   JSON schema. A default implementation of `validate` is provided which
 //   does a JSV validation. Override `validate` to add additional custom
 //   validation or exclude JSV validation alltogether.
@@ -32,7 +32,7 @@ model = Backbone.Model.extend({
     // Use JSV validation by default. Override this to provide your own custom
     // validation logic.
     validate: function(attr) {
-        var error = this.validateSchema(attr);
+        var error = this.validateAttributes(attr);
         return error;
     },
     // Get the JSV schema object for this model, registering it if not found.
@@ -50,8 +50,15 @@ model = Backbone.Model.extend({
         return schema;
     },
     // Method to validate attributes against the model's JSON schema.
-    validateSchema: function(attr) {
-        var errors = this.getSchema().validate(attr).errors;
+    // Validate properties separately to allow subsets of attributes.
+    validateAttributes: function(attr) {
+        var errors = [];
+        var properties = this.getSchema().getAttribute('properties');
+        _(attr).each(function(v, k) {
+            // Let unknown attributes pass through.
+            if (!properties[k]) return;
+            errors = errors.concat(properties[k].validate(v).errors);
+        });
         if (errors.length) {
             var error = errors.pop();
             var property = getEnv().findSchema(error.schemaUri).getValue();
