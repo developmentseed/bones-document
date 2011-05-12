@@ -69,7 +69,10 @@ exports['routes'] = function(beforeExit) {
     assert.response(main.server, {
         url: '/api/Page/data04',
         method: 'PUT',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+            'content-type': 'application/json',
+            'cookie': 'bones.token=1f4a1137268b8e384e50d0fb72c627c4'
+        },
         body: JSON.stringify(data04)
     }, {
         body: '{}',
@@ -80,7 +83,7 @@ exports['routes'] = function(beforeExit) {
         assert.deepEqual(data04, JSON.parse(contents));
 
         assert.response(main.server, {
-            url: '/api/Page',
+            url: '/api/Page/data04',
             method: 'DELETE',
             headers: {
                 'content-type': 'application/json',
