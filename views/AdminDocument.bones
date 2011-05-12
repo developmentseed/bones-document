@@ -33,7 +33,7 @@ view = Backbone.View.extend({
     del: function() {
         confirm('Are you sure you want to delete this page?') && this.model.destroy({
             success: function() {
-                window.location.hash = '#/';
+                window.location.hash = '';
             },
             error: Bones.admin.error
         });
