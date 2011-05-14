@@ -10,12 +10,16 @@ view = Backbone.View.extend({
         'click .edit': 'edit',
         'click .del': 'del',
         'click .save': 'save',
-        'click .cancel': 'cancel'
+        'click .cancel': 'stopEditMode'
     },
     initialize: function(options) {
-        _.bindAll(this, 'render', 'edit', 'del', 'save', 'cancel');
+        _.bindAll(this, 'render', 'edit', 'del', 'save');
         this.display = options.display;
         this.render().trigger('attach');
+    },
+    stopEditMode: function() {
+        $('html').removeClass('bonesAdminEditing');
+        this.display.render().trigger('attach');
     },
     render: function() {
         $(this.el).html(templates.AdminDocument(this.model.renderer()));
@@ -49,12 +53,7 @@ view = Backbone.View.extend({
         if (!_.isEmpty(data)) {
             that.model.save(data, { error: Bones.admin.error });
         }
-        $('html').removeClass('bonesAdminEditing');
-        this.display.render().trigger('attach');
+        this.stopEditMode();
         this.render();
-    },
-    cancel: function() {
-        $('html').removeClass('bonesAdminEditing');
-        this.display.render().trigger('attach');
     }
 });
