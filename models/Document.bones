@@ -93,7 +93,7 @@ model = Backbone.Model.extend({
                     type = options.formatters[attribute];
                 }
                 if (type && model.renderers[type]) {
-                    return renderer = model.renderers[type](model.get(attribute));
+                    return renderer = model.renderers[type].apply(model, [model.get(attribute)]);
                 }
                 return model.escape(attribute);
             };
