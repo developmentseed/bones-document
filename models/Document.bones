@@ -97,7 +97,15 @@ model = Backbone.Model.extend({
                 }
                 return model.escape(attribute);
             };
-            return _.extend({ render: render }, attributes);
+            var title = function(attribute) {
+                var title = model.schema &&
+                    model.schema.properties &&
+                    model.schema.properties[attribute] &&
+                    model.schema.properties[attribute].title;
+                title = title || '';
+                return title.replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            };
+            return _.extend({ render: render, title: title }, attributes);
         };
         var data = {};
         if (options.editable) {
