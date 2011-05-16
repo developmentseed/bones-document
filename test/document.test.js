@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 var assert = require('assert');
 var spawn = require('child_process').spawn;
 var fs = require('fs');
@@ -37,7 +38,25 @@ exports['routes'] = function(beforeExit) {
         },
         body: JSON.stringify(data02)
     }, {
-        body: '{"error":"Template: Instance is not one of the possible values"}',
+        body: 'Template: Instance is not one of the possible values',
+        status: 409
+    }, function() {
+        assert['throws'](function() {
+            fs.statSync(__dirname + '/fixture/pages/api.Page.data02.json', 'utf8');
+        }, "ENOENT, No such file or directory");
+    });
+
+    assert.response(main.server, {
+        url: '/api/Page',
+        method: 'POST',
+        headers: {
+            'accept': 'application/json',
+            'content-type': 'application/json',
+            'cookie': 'bones.token=1f4a1137268b8e384e50d0fb72c627c4'
+        },
+        body: JSON.stringify(data02)
+    }, {
+        body: '{"message":"Template: Instance is not one of the possible values"}',
         status: 409
     }, function() {
         assert['throws'](function() {
