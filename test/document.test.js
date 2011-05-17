@@ -5,12 +5,12 @@ var fs = require('fs');
 
 require('./fixture');
 var fixture = require('bones').plugin;
-var main = new fixture.servers['Document'](fixture);
+var server = new fixture.servers['Core'](fixture);
 
 
 exports['routes'] = function(beforeExit) {
     var data01 = { "bones.token": "1f4a1137268b8e384e50d0fb72c627c4", id: "data01", key: "value" };
-    assert.response(main.server, {
+    assert.response(server, {
         url: '/api/Page',
         method: 'POST',
         headers: {
@@ -29,7 +29,7 @@ exports['routes'] = function(beforeExit) {
 
     // Attempt to send an invalid value for `template`.
     var data02 = { "bones.token": "1f4a1137268b8e384e50d0fb72c627c4", id: "data02", template: "Invalid" };
-    assert.response(main.server, {
+    assert.response(server, {
         url: '/api/Page',
         method: 'POST',
         headers: {
@@ -46,7 +46,7 @@ exports['routes'] = function(beforeExit) {
         }, "ENOENT, No such file or directory");
     });
 
-    assert.response(main.server, {
+    assert.response(server, {
         url: '/api/Page',
         method: 'POST',
         headers: {
@@ -66,7 +66,7 @@ exports['routes'] = function(beforeExit) {
 
     // PUT to non-existant file.
     var data03 = { "bones.token": "1f4a1137268b8e384e50d0fb72c627c4", id: "data03", key: "value" };
-    assert.response(main.server, {
+    assert.response(server, {
         url: '/api/Page/data03',
         method: 'PUT',
         headers: {
@@ -85,7 +85,7 @@ exports['routes'] = function(beforeExit) {
 
     // Create and delete.
     var data04 = { "bones.token": "1f4a1137268b8e384e50d0fb72c627c4", id: "data04", key: "value" };
-    assert.response(main.server, {
+    assert.response(server, {
         url: '/api/Page/data04',
         method: 'PUT',
         headers: {
@@ -101,7 +101,7 @@ exports['routes'] = function(beforeExit) {
         var contents = fs.readFileSync(__dirname + '/fixture/pages/api.Page.data04.json', 'utf8');
         assert.deepEqual(data04, JSON.parse(contents));
 
-        assert.response(main.server, {
+        assert.response(server, {
             url: '/api/Page/data04',
             method: 'DELETE',
             headers: {
