@@ -1,12 +1,13 @@
 var path = require('path');
 
-server = servers.Core.augment({
+servers.Route.augment({
     initializeAssets: function(parent, app) {
         parent.call(this, app);
         var jsv = path.dirname(require.resolve('JSV'));
-        app.assets.core.push(path.join(jsv, 'uri/uri.js'));
-        app.assets.core.push(require.resolve('JSV'));
-        app.assets.core.push(path.join(jsv, 'json-schema-draft-03.js'));
-        app.assets.core.push(require.resolve('showdown'));
+        this.assets.core = this.assets.core || [];
+        this.assets.core.push(path.join(jsv, 'uri/uri.js'));
+        this.assets.core.push(require.resolve('JSV'));
+        this.assets.core.push(path.join(jsv, 'json-schema-draft-03.js'));
+        this.assets.core.push(require.resolve('showdown'));
     }
 });
