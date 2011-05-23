@@ -51,9 +51,13 @@ view = Backbone.View.extend({
             el.size() && (data[key] = that.model.edit('value', el, key));
         });
         if (!_.isEmpty(data)) {
-            that.model.save(data, { error: Bones.admin.error });
+            that.model.save(data, {
+                success: function() {
+                    that.editEnd();
+                    that.render();
+                },
+                error: Bones.admin.error
+            });
         }
-        this.editEnd();
-        this.render();
     }
 });
