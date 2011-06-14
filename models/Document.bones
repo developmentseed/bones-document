@@ -103,7 +103,8 @@ model = Backbone.Model.extend({
                 return model.escape(attribute);
             };
             var title = function(attribute) {
-                var title = model.schema &&
+                var title = that.get(attribute) &&
+                    model.schema &&
                     model.schema.properties &&
                     model.schema.properties[attribute] &&
                     model.schema.properties[attribute].title;
