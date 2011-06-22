@@ -29,7 +29,7 @@ view = Backbone.View.extend({
         var that = this;
         this.display.render({editable: true});
         _(this.model.renderer({ editable: true, keys: true })).each(function(key) {
-            var el = that.display.$('.' + that.model.id + '.' + key);
+            var el = that.display.$('.' + that.model.id + '.editable-' + key);
             el.size() && that.model.edit('form', el, key);
         });
         $('html').addClass('bonesAdminEditing');
@@ -47,7 +47,7 @@ view = Backbone.View.extend({
         var that = this;
         var data = {};
         _(this.model.renderer({ editable: true, keys: true })).each(function(key) {
-            var el = that.display.$('.' + that.model.id + '.' + key);
+            var el = that.display.$('.' + that.model.id + '.editable-' + key);
             el.size() && (data[key] = that.model.edit('value', el, key));
         });
         if (!_.isEmpty(data)) {
