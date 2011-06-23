@@ -5,6 +5,7 @@
 // be called with options that can be passed to `Document.renderer()` or
 // overridden as needed.
 view = Backbone.View.extend({
+    className: 'adminDocument',
     display: null,
     events: {
         'click .edit': 'edit',
