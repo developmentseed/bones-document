@@ -208,10 +208,10 @@ model = Backbone.Model.extend({
                         // Find scrolling height of text in clone and update
                         var height = clone.scrollTop();
                         if (!$.browser.msie) {
-                            var top = parseInt(textarea.css('padding-top').replace(/px$/, ''));
-                            var bottom = parseInt(textarea.css('padding-bottom').replace(/px$/, ''));
-                            height += _.isNumber(top) ? top : 0;
-                            height += _.isNumber(bottom) ? bottom : 0;
+                            _.each(['top', 'bottom'], function(padding) {
+                                padding = textarea.css('padding-' + padding);
+                                height += padding ? parseInt(padding.replace(/px$/, '')) : 0;
+                            });
                         }
                         $(this).height(height);
                     };
