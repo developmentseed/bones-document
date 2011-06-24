@@ -187,19 +187,19 @@ model = Backbone.Model.extend({
                 // Clone textarea, hide off screen.
                 var clone = (function(){
                         return textarea.clone().removeAttr('id').removeAttr('name').css({
-                            'position': 'absolute',
-                            'top': 0,
-                            'left': -9999,
-                            'height': 0,
-                            'minHeight': 0,
-                            'width': textarea.css('width'),
-                            'padding-top': $.browser.msie ? 0 : textarea.css('padding-top'),
-                            'padding-right': $.browser.msie ? 0 : textarea.css('padding-right'),
-                            'padding-bottom': $.browser.msie ? 0 : textarea.css('padding-bottom'),
-                            'padding-left': $.browser.msie ? 0 : textarea.css('padding-left'),
-                            'lineHeight': textarea.css('lineHeight'),
-                            'textDecoration': textarea.css('textDecoration'),
-                            'letterSpacing': textarea.css('letterSpacing')
+                            position: 'absolute',
+                            top: 0,
+                            left: -9999,
+                            height: 0,
+                            minHeight: 0,
+                            width: textarea.css('width'),
+                            paddingTop: $.browser.msie ? 0 : textarea.css('paddingTop'),
+                            paddingRight: $.browser.msie ? 0 : textarea.css('paddingRight'),
+                            paddingBottom: $.browser.msie ? 0 : textarea.css('paddingBottom'),
+                            paddingLeft: $.browser.msie ? 0 : textarea.css('paddingLeft'),
+                            lineHeight: textarea.css('lineHeight'),
+                            textDecoration: textarea.css('textDecoration'),
+                            letterSpacing: textarea.css('letterSpacing')
                         }).attr('tabIndex','-1').insertBefore(textarea);
                     })(),
                     updateSize = function() {
