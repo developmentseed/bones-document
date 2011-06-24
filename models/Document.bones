@@ -193,7 +193,10 @@ model = Backbone.Model.extend({
                             height: 0,
                             minHeight: 0,
                             width: textarea.css('width'),
-                            padding: $.browser.msie ? 0 : textarea.css('padding'),
+                            'padding-top': $.browser.msie ? 0 : textarea.css('padding-top'),
+                            'padding-right': $.browser.msie ? 0 : textarea.css('padding-right'),
+                            'padding-bottom': $.browser.msie ? 0 : textarea.css('padding-bottom'),
+                            'padding-left': $.browser.msie ? 0 : textarea.css('padding-left'),
                             lineHeight: textarea.css('lineHeight'),
                             textDecoration: textarea.css('textDecoration'),
                             letterSpacing: textarea.css('letterSpacing')
@@ -203,7 +206,14 @@ model = Backbone.Model.extend({
                         // Update clone.
                         clone.val($(this).val()).scrollTop(10000);
                         // Find scrolling height of text in clone and update
-                        $(this).height(clone.scrollTop());
+                        var height = clone.scrollTop();
+                        if (!$.browser.msie) {
+                            var top = parseInt(textarea.css('padding-top').replace(/px$/, ''));
+                            var bottom = parseInt(textarea.css('padding-bottom').replace(/px$/, ''));
+                            height += _.isNumber(top) ? top : 0;
+                            height += _.isNumber(bottom) ? bottom : 0;
+                        }
+                        $(this).height(height);
                     };
                 textarea
                     .bind('keyup', updateSize)
