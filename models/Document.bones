@@ -212,6 +212,9 @@ model = Backbone.Model.extend({
                                 padding = textarea.css('padding-' + padding);
                                 height += padding ? parseInt(padding.replace(/px$/, '')) : 0;
                             });
+                            // Add extra padding to the bottom of the textarea
+                            // to simulate an extra line.
+                            height += parseInt(clone.css('line-height').replace(/px$/, ''));
                         }
                         $(this).height(height);
                     };
