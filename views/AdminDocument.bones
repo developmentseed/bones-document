@@ -16,11 +16,11 @@ view = Backbone.View.extend({
     initialize: function(options) {
         _.bindAll(this, 'render', 'edit', 'del', 'save');
         this.display = options.display;
-        this.render().trigger('attach');
+        this.render();
     },
     editEnd: function() {
         $('html').removeClass('bonesAdminEditing');
-        this.display.render().trigger('attach');
+        this.display.render();
     },
     render: function() {
         $(this.el).html(templates.AdminDocument(this.model.renderer()));
