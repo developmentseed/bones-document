@@ -133,7 +133,7 @@ model = Backbone.Model.extend({
             return value;
         },
         markdown: function(value) {
-            value = stripTags(value || '');
+            value = this.stripTags(value || '');
             return (new Showdown.converter()).makeHtml(value);
         }
     },
@@ -229,80 +229,80 @@ model = Backbone.Model.extend({
                 return el.val();
             }
         }
-    }
-});
+    },
+    // Strip tags. From node-markdown.
+    // -------------------------------
+    stripTags: function(html /*, allowedTags, allowedAttributes */) {
+        var allowedTags = arguments[1] ||
+                'a|b|blockquote|code|del|dd|dl|dt|em|h1|h2|h3|' +
+                'i|img|li|ol|p|pre|sup|sub|strong|strike|ul|br|hr|' +
+                'table|thead|th|tbody|tr|td|div|span',
+            allowedAttributes = arguments[2] || {
+                'img': 'src|width|height|alt',
+                'a': 'href',
+                'td': 'rowspan|colspan',
+                'table': 'cellspacing',
+                '*': 'title|id|class'
+            };
+            testAllowed = new RegExp('^(' + allowedTags.toLowerCase() + ')$'),
+            findTags = /<(\/?)\s*([\w:\-]+)([^>]*)>/g,
+            findAttribs = /(\s*)([\w:-]+)\s*=\s*(["'])([^\3]+?)(?:\3)/g;
 
-// Strip tags. From node-markdown.
-// -------------------------------
-var stripTags = function(html /*, allowedTags, allowedAttributes */) {
-    var allowedTags = arguments[1] ||
-            'a|b|blockquote|code|del|dd|dl|dt|em|h1|h2|h3|' +
-            'i|img|li|ol|p|pre|sup|sub|strong|strike|ul|br|hr|' +
-            'table|thead|th|tbody|tr|td|div|span',
-        allowedAttributes = arguments[2] || {
-            'img': 'src|width|height|alt',
-            'a': 'href',
-            'table': 'cellspacing',
-            '*': 'title|id|class'
-        };
-        testAllowed = new RegExp('^(' + allowedTags.toLowerCase() + ')$'),
-        findTags = /<(\/?)\s*([\w:\-]+)([^>]*)>/g,
-        findAttribs = /(\s*)([\w:-]+)\s*=\s*(["'])([^\3]+?)(?:\3)/g;
-
-    // convert all strings patterns into regexp objects
-    for (var i in allowedAttributes) {
-        if (allowedAttributes.hasOwnProperty(i)) {
-            allowedAttributes[i] = new RegExp('^(' +
-                allowedAttributes[i].toLowerCase() + ')$');
-        }
-    }
-
-    // find and match html tags
-    return html.replace(findTags, function(original, lslash, tag, params) {
-        var tagAttr, wildcardAttr,
-            rslash = params.substr(-1) == '/' && '/' || '';
-
-        tag = tag.toLowerCase();
-
-        // tag is not allowed, return empty string
-        if (!tag.match(testAllowed))
-            return '';
-
-        // tag is allowed
-        else {
-            // regexp objects for a particular tag
-            tagAttr = tag in allowedAttributes && allowedAttributes[tag];
-            wildcardAttr = '*' in allowedAttributes && allowedAttributes['*'];
-
-            // if no attribs are allowed
-            if (!tagAttr && !wildcardAttr)
-                return '<' + lslash + tag + rslash + '>';
-
-            // remove trailing slash if any
-            params = $.trim(params);
-            if (rslash) {
-                params = params.substr(0, params.length - 1);
+        // convert all strings patterns into regexp objects
+        for (var i in allowedAttributes) {
+            if (allowedAttributes.hasOwnProperty(i)) {
+                allowedAttributes[i] = new RegExp('^(' +
+                    allowedAttributes[i].toLowerCase() + ')$');
             }
+        }
 
-            // find and remove unwanted attributes
-            params = params.replace(findAttribs, function(original, space,
-                                                            name, quot, value) {
-                name = name.toLowerCase();
+        // find and match html tags
+        return html.replace(findTags, function(original, lslash, tag, params) {
+            var tagAttr, wildcardAttr,
+                rslash = params.substr(-1) == '/' && '/' || '';
 
-                // force javascript: links to #
-                if (name == 'href' && $.trim(value).substr(0,
-                        'javascript:'.length) == 'javascript:') {
-                    value = '#';
+            tag = tag.toLowerCase();
+
+            // tag is not allowed, return empty string
+            if (!tag.match(testAllowed))
+                return '';
+
+            // tag is allowed
+            else {
+                // regexp objects for a particular tag
+                tagAttr = tag in allowedAttributes && allowedAttributes[tag];
+                wildcardAttr = '*' in allowedAttributes && allowedAttributes['*'];
+
+                // if no attribs are allowed
+                if (!tagAttr && !wildcardAttr)
+                    return '<' + lslash + tag + rslash + '>';
+
+                // remove trailing slash if any
+                params = $.trim(params);
+                if (rslash) {
+                    params = params.substr(0, params.length - 1);
                 }
 
-                if ((wildcardAttr && name.match(wildcardAttr)) ||
-                        (tagAttr && name.match(tagAttr))) {
-                    return space + name + '=' + quot + value + quot;
-                }else
-                    return '';
-            });
+                // find and remove unwanted attributes
+                params = params.replace(findAttribs, function(original, space,
+                                                                name, quot, value) {
+                    name = name.toLowerCase();
 
-            return '<' + lslash + tag + (params ? ' ' + params : '') + rslash + '>';
-        }
-    });
-};
+                    // force javascript: links to #
+                    if (name == 'href' && $.trim(value).substr(0,
+                            'javascript:'.length) == 'javascript:') {
+                        value = '#';
+                    }
+                    
+                    if ((wildcardAttr && name.match(wildcardAttr)) ||
+                            (tagAttr && name.match(tagAttr))) {
+                        return space + name + '=' + quot + value + quot;
+                    }else
+                        return '';
+                });
+
+                return '<' + lslash + tag + (params ? ' ' + params : '') + rslash + '>';
+            }
+        });
+    }
+});
