@@ -278,7 +278,7 @@ model = Backbone.Model.extend({
                     return '<' + lslash + tag + rslash + '>';
 
                 // remove trailing slash if any
-                params = params.trim();
+                params = $.trim(params);
                 if (rslash) {
                     params = params.substr(0, params.length - 1);
                 }
@@ -289,7 +289,7 @@ model = Backbone.Model.extend({
                     name = name.toLowerCase();
 
                     // force javascript: links to #
-                    if (name == 'href' && value.trim().substr(0,
+                    if (name == 'href' && $.trim(value).substr(0,
                             'javascript:'.length) == 'javascript:') {
                         value = '#';
                     }
